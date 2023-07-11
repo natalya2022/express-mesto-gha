@@ -21,6 +21,14 @@ connector()
 // eslint-disable-next-line no-console
   .catch((err) => console.log(err));
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64ada5056b10e43fcd41d350',
+  };
+
+  next();
+});
+
 app.use('/users', require('./routes/users'));
 
 // app.listen(PORT, () => {
