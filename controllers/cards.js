@@ -66,6 +66,76 @@ module.exports.deleteCard = async (req, res) => {
   }
 };
 
+module.exports.likeCard = async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    const card = await Card.findById({ _id: cardId });
+    if (!card) {
+      return res.status(404).send({
+        message: 'Карта с указанным id отсутствует',
+      });
+    }
+    if (card.likes.find((item) => item.toString() === req.user._id)) {
+      return res.status(400).send({
+        message: 'Лайк уже проставлен',
+      });
+    }
+    if (await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    )) {
+      return res.status(200).send(card);
+    }
+    return res.status(500).send({
+      message: 'Ошибка при проставлении лайка',
+    });
+  } catch (err) {
+    return res.status(500).send({
+      message: 'Ошибка в работе сервера',
+      err,
+    });
+  }
+};
+
+module.exports.dislikeCard = async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    const card = await Card.findById({ _id: cardId });
+    if (!card) {
+      return res.status(404).send({
+        message: 'Карта с указанным id отсутствует',
+      });
+    }
+    if (!card.likes.find((item) => item.toString() === req.user._id)) {
+      return res.status(400).send({
+        message: 'Лайк еще не проставлен',
+      });
+    }
+    if (await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    )) {
+      return res.status(200).send(card);
+    }
+    return res.status(500).send({
+      message: 'Ошибка при снятии лайка',
+    });
+  } catch (err) {
+    return res.status(500).send({
+      message: 'Ошибка в работе сервера',
+      err,
+    });
+  }
+};
+
+// module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
+//   req.params.cardId,
+//   { $pull: { likes: req.user._id } }, // убрать _id из массива
+//   { new: true },
+// );
+
 // module.exports.deleteCard = async (req, res) => {
 //   try {
 //     const { cardId } = req.params;
