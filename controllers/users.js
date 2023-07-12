@@ -27,8 +27,10 @@ module.exports.getUsers = async (req, res) => {
 
 module.exports.getUserId = async (req, res) => {
   try {
-    const { id } = req.params.id;
-    const user = await User.findById({ id });
+    // eslint-disable-next-line no-console
+    console.log(req.params);
+    const { userId } = req.params;
+    const user = await User.findById({ _id: userId });
     // eslint-disable-next-line no-console
     console.log(user);
     return res.status(200).send(user);
