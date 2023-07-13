@@ -79,3 +79,17 @@ module.exports.createUser = async (req, res) => {
     });
   }
 };
+
+module.exports.updateUser = async (req, res) => {
+  try {
+    // eslint-disable-next-line no-console
+    console.log(req.body, req.user);
+    const user = await User.findByIdAndUpdate(req.user._id, req.body, { returnDocument: 'after' });
+    return res.status(200).send(user);
+  } catch (err) {
+    return res.status(500).send({
+      message: 'Ошибка в работе сервера',
+      err,
+    });
+  }
+};
