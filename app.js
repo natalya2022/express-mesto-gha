@@ -17,9 +17,9 @@ async function connector() {
 
 connector()
 // eslint-disable-next-line no-console
-  .then(() => console.log('ok'))
+  .then(() => console.log('connect'))
 // eslint-disable-next-line no-console
-  .catch((err) => console.log(err));
+  .catch((err) => console.error(err));
 
 app.use((req, res, next) => {
   req.user = {
@@ -30,12 +30,6 @@ app.use((req, res, next) => {
 
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
-
-// app.listen(PORT, () => {
-//   Если всё работает, консоль покажет, какой порт приложение слушает
-//   eslint-disable-next-line no-console
-//   console.log(`App listening on port ${PORT}`);
-// });
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

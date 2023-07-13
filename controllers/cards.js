@@ -129,31 +129,3 @@ module.exports.dislikeCard = async (req, res) => {
     });
   }
 };
-
-// module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
-//   req.params.cardId,
-//   { $pull: { likes: req.user._id } }, // убрать _id из массива
-//   { new: true },
-// );
-
-// module.exports.deleteCard = async (req, res) => {
-//   try {
-//     const { cardId } = req.params;
-//     // const { _id } = req.user;
-//     const card = await Card.findByIdAndRemove({ _id: cardId });
-//     // eslint-disable-next-line no-console
-//     console.log(card);
-//     return res.status(200).send(card);
-//   } catch (err) {
-//     // if (err.kind === 'ObjectId') {
-//     //   return res.status(400).send({
-//     //     message: 'Ошибочные данные. Пользователя с таким id не существует',
-//     //     err,
-//     //   });
-//     // }
-//     return res.status(500).send({
-//       message: 'Ошибка в работе сервера',
-//       err,
-//     });
-//   }
-// };
