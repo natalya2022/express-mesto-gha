@@ -59,6 +59,12 @@ module.exports.deleteCard = async (req, res) => {
       message: 'Ошибка при удалении карты',
     });
   } catch (err) {
+    if (err.kind === 'ObjectId') {
+      return res.status(400).send({
+        message: 'Ошибка при введении данных',
+        err,
+      });
+    }
     return res.status(500).send({
       message: 'Ошибка в работе сервера',
       err,
