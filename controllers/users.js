@@ -7,15 +7,16 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require('../errors/responses');
+const logErrors = require('../errors/logger');
 
 module.exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({});
     return res.status(OK).send(users);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -31,15 +32,14 @@ module.exports.getUserId = async (req, res) => {
     }
     return res.status(OK).send(user);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -50,15 +50,14 @@ module.exports.createUser = async (req, res) => {
     const user = await User.create({ name, about, avatar });
     return res.status(CREATED).send(user);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -69,15 +68,14 @@ module.exports.updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(OK).send(user);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -88,15 +86,14 @@ module.exports.updateAvatar = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(OK).send(user);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };

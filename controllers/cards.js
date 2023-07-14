@@ -9,11 +9,6 @@ const {
 } = require('../errors/responses');
 const logErrors = require('../errors/logger');
 
-// const logErrors = (err) => {
-//   const now = new Date();
-//   fs.appendFile('error.log', `${now.toUTCString()} ${JSON.stringify(err)}\n`, () => {});
-// };
-
 module.exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
@@ -22,7 +17,6 @@ module.exports.getCards = async (req, res) => {
     logErrors(req.user, req.params, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -38,12 +32,10 @@ module.exports.createCard = async (req, res) => {
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -63,12 +55,10 @@ module.exports.deleteCard = async (req, res) => {
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -88,16 +78,14 @@ module.exports.likeCard = async (req, res) => {
     );
     return res.status(OK).send(card);
   } catch (err) {
-    logErrors(err);
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
@@ -117,16 +105,14 @@ module.exports.dislikeCard = async (req, res) => {
     );
     return res.status(OK).send(card);
   } catch (err) {
-    logErrors(err);
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
-        err,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
-      err,
     });
   }
 };
