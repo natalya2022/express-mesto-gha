@@ -1,4 +1,11 @@
 const User = require('../models/user');
+// const {
+//   OK,
+//   CREATED,
+//   BAD_REQUEST,
+//   NOT_FOUND,
+//   INTERNAL_SERVER_ERROR,
+// } = require('../errors/responses');
 
 module.exports.getUsers = async (req, res) => {
   try {
@@ -65,7 +72,29 @@ module.exports.updateUser = async (req, res) => {
   try {
     // eslint-disable-next-line no-console
     console.log(req.body, req.user);
-    const user = await User.findByIdAndUpdate(req.user._id, req.body, { returnDocument: 'after', runValidators: true });
+    const { name, about } = req.body;
+    const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { returnDocument: 'after', runValidators: true });
+    return res.status(200).send(user);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({
+        message: 'Ошибка при введении данных',
+        err,
+      });
+    }
+    return res.status(500).send({
+      message: 'Ошибка в работе сервера',
+      err,
+    });
+  }
+};
+
+module.exports.updateAvatar = async (req, res) => {
+  try {
+    // eslint-disable-next-line no-console
+    console.log(req.body, req.user);
+    const { avatar } = req.body;
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { returnDocument: 'after', runValidators: true });
     return res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
