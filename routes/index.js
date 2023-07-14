@@ -4,7 +4,7 @@ const { NOT_FOUND } = require('../errors/responses');
 router.use('/users', require('./users'));
 router.use('/cards', require('./cards'));
 
-router.use('*', (req, res) => res.status(NOT_FOUND).send({
+router.use('*', (req, res) => res.status(NOT_FOUND.status).send({
   message: 'Неизвестный endpoint',
 }));
 

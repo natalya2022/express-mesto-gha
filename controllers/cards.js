@@ -1,19 +1,20 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
-// const {
-//   OK,
-//   CREATED,
-//   BAD_REQUEST,
-//   NOT_FOUND,
-//   INTERNAL_SERVER_ERROR } = require('../errors/responses');
+const {
+  OK,
+  CREATED,
+  BAD_REQUEST,
+  NOT_FOUND,
+  INTERNAL_SERVER_ERROR,
+} = require('../errors/responses');
 
 module.exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
-    return res.status(200).send(cards);
+    return res.status(OK).send(cards);
   } catch (err) {
-    return res.status(500).send({
-      message: 'Ошибка сервера',
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
       err,
     });
   }
@@ -24,16 +25,16 @@ module.exports.createCard = async (req, res) => {
     const { _id } = req.user;
     const { name, link } = req.body;
     const card = await Card.create({ name, link, owner: _id });
-    return res.status(201).send(card);
+    return res.status(CREATED).send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
-      return res.status(400).send({
-        message: 'Ошибка при введении данных',
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
         err,
       });
     }
-    return res.status(500).send({
-      message: 'Ошибка сервера',
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
       err,
     });
   }
@@ -43,21 +44,21 @@ module.exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     if (!await Card.findById({ _id: cardId })) {
-      return res.status(404).send({
-        message: 'Карта с указанным id отсутствует',
+      return res.status(NOT_FOUND.status).send({
+        message: NOT_FOUND.message,
       });
     }
     const card = await Card.findByIdAndRemove({ _id: cardId });
-    return res.status(200).send(card);
+    return res.status(OK).send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(400).send({
-        message: 'Ошибка при введении данных',
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
         err,
       });
     }
-    return res.status(500).send({
-      message: 'Ошибка сервера',
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
       err,
     });
   }
@@ -67,8 +68,8 @@ module.exports.likeCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     if (!await Card.findById({ _id: cardId })) {
-      return res.status(404).send({
-        message: 'Карта с указанным id отсутствует',
+      return res.status(NOT_FOUND.status).send({
+        message: NOT_FOUND.message,
       });
     }
     const card = await Card.findByIdAndUpdate(
@@ -76,16 +77,16 @@ module.exports.likeCard = async (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true },
     );
-    return res.status(200).send(card);
+    return res.status(OK).send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(400).send({
-        message: 'Ошибка при введении данных',
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
         err,
       });
     }
-    return res.status(500).send({
-      message: 'Ошибка сервера',
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
       err,
     });
   }
@@ -95,8 +96,8 @@ module.exports.dislikeCard = async (req, res) => {
   try {
     const { cardId } = req.params;
     if (!await Card.findById({ _id: cardId })) {
-      return res.status(404).send({
-        message: 'Карта с указанным id отсутствует',
+      return res.status(NOT_FOUND.status).send({
+        message: NOT_FOUND.message,
       });
     }
     const card = await Card.findByIdAndUpdate(
@@ -104,16 +105,16 @@ module.exports.dislikeCard = async (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true },
     );
-    return res.status(200).send(card);
+    return res.status(OK).send(card);
   } catch (err) {
     if (err instanceof mongoose.Error.CastError) {
-      return res.status(400).send({
-        message: 'Ошибка при введении данных',
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
         err,
       });
     }
-    return res.status(500).send({
-      message: 'Ошибка сервера',
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
       err,
     });
   }
