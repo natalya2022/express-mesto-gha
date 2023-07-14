@@ -7,12 +7,19 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require('../errors/responses');
+const logErrors = require('../errors/logger');
+
+// const logErrors = (err) => {
+//   const now = new Date();
+//   fs.appendFile('error.log', `${now.toUTCString()} ${JSON.stringify(err)}\n`, () => {});
+// };
 
 module.exports.getCards = async (req, res) => {
   try {
     const cards = await Card.find({});
     return res.status(OK).send(cards);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
       err,
@@ -27,6 +34,7 @@ module.exports.createCard = async (req, res) => {
     const card = await Card.create({ name, link, owner: _id });
     return res.status(CREATED).send(card);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -51,6 +59,7 @@ module.exports.deleteCard = async (req, res) => {
     const card = await Card.findByIdAndRemove({ _id: cardId });
     return res.status(OK).send(card);
   } catch (err) {
+    logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -79,6 +88,7 @@ module.exports.likeCard = async (req, res) => {
     );
     return res.status(OK).send(card);
   } catch (err) {
+    logErrors(err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -107,6 +117,7 @@ module.exports.dislikeCard = async (req, res) => {
     );
     return res.status(OK).send(card);
   } catch (err) {
+    logErrors(err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
