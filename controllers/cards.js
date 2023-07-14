@@ -1,4 +1,4 @@
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 const Card = require('../models/card');
 // const {
 //   OK,
@@ -26,7 +26,7 @@ module.exports.createCard = async (req, res) => {
     const card = await Card.create({ name, link, owner: _id });
     return res.status(201).send(card);
   } catch (err) {
-    if (err instanceof mongoose.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -50,7 +50,7 @@ module.exports.deleteCard = async (req, res) => {
     const card = await Card.findByIdAndRemove({ _id: cardId });
     return res.status(200).send(card);
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
+    if (err instanceof mongoose.Error.CastError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -78,7 +78,7 @@ module.exports.likeCard = async (req, res) => {
     );
     return res.status(200).send(card);
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
+    if (err instanceof mongoose.Error.CastError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -106,7 +106,7 @@ module.exports.dislikeCard = async (req, res) => {
     );
     return res.status(200).send(card);
   } catch (err) {
-    if (err instanceof mongoose.CastError) {
+    if (err instanceof mongoose.Error.CastError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,

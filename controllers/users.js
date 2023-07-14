@@ -1,4 +1,4 @@
-const { default: mongoose } = require('mongoose');
+const mongoose = require('mongoose');
 const User = require('../models/user');
 // const {
 //   OK,
@@ -32,7 +32,7 @@ module.exports.getUserId = async (req, res) => {
     return res.status(200).send(user);
   } catch (err) {
     // if (err.kind === 'ObjectId') {
-    if (err instanceof mongoose.CastError) {
+    if (err instanceof mongoose.Error.CastError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -48,11 +48,13 @@ module.exports.getUserId = async (req, res) => {
 module.exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
-    const user = await User.create({ name, about, avatar });
+    const user = await User.create({ name, about, avatar }, { runValidators: true });
     return res.status(201).send(user);
   } catch (err) {
     // if (err.name === 'ValidationError') {
-    if (err instanceof mongoose.ValidationError) {
+    console.log(err);
+    console.log(mongoose.Error.ValidationError);
+    if (err instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -71,7 +73,7 @@ module.exports.updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(200).send(user);
   } catch (err) {
-    if (err instanceof mongoose.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
@@ -90,7 +92,7 @@ module.exports.updateAvatar = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(200).send(user);
   } catch (err) {
-    if (err instanceof mongoose.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       return res.status(400).send({
         message: 'Ошибка при введении данных',
         err,
