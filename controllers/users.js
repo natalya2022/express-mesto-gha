@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const { User, userSchemaObject } = require('../models/user');
 const {
   OK,
   CREATED,
@@ -14,7 +15,7 @@ module.exports.getUsers = async (req, res) => {
     const users = await User.find({});
     return res.status(OK).send(users);
   } catch (err) {
-    logErrors(req.user, req.params, err);
+    logErrors(req.user, req.params, req.body, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
       message: INTERNAL_SERVER_ERROR.message,
     });
@@ -32,7 +33,7 @@ module.exports.getUserId = async (req, res) => {
     }
     return res.status(OK).send(user);
   } catch (err) {
-    logErrors(req.user, req.params, err);
+    logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -46,11 +47,21 @@ module.exports.getUserId = async (req, res) => {
 
 module.exports.createUser = async (req, res) => {
   try {
-    const { name, about, avatar } = req.body;
-    const user = await User.create({ name, about, avatar });
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
+    if (req.body.password.length < userSchemaObject.password.minlength[0]) {
+      return res.status(BAD_REQUEST.status).send({
+        message: userSchemaObject.password.minlength[1],
+      });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name, about, avatar, email, password: hash,
+    });
     return res.status(CREATED).send(user);
   } catch (err) {
-    logErrors(req.user, req.params, err);
+    logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -62,13 +73,35 @@ module.exports.createUser = async (req, res) => {
   }
 };
 
+// module.exports.createUser = async (req, res) => {
+//   try {
+//     const {
+//       name, about, avatar, email, password,
+//     } = req.body;
+//     const user = await User.create({
+//       name, about, avatar, email, password,
+//     });
+//     return res.status(CREATED).send(user);
+//   } catch (err) {
+//     logErrors(req.user, req.params, err);
+//     if (err instanceof mongoose.Error.ValidationError) {
+//       return res.status(BAD_REQUEST.status).send({
+//         message: BAD_REQUEST.message,
+//       });
+//     }
+//     return res.status(INTERNAL_SERVER_ERROR.status).send({
+//       message: INTERNAL_SERVER_ERROR.message,
+//     });
+//   }
+// };
+
 module.exports.updateUser = async (req, res) => {
   try {
     const { name, about } = req.body;
     const user = await User.findByIdAndUpdate(req.user._id, { name, about }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(OK).send(user);
   } catch (err) {
-    logErrors(req.user, req.params, err);
+    logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -86,7 +119,7 @@ module.exports.updateAvatar = async (req, res) => {
     const user = await User.findByIdAndUpdate(req.user._id, { avatar }, { returnDocument: 'after', runValidators: true, new: true });
     return res.status(OK).send(user);
   } catch (err) {
-    logErrors(req.user, req.params, err);
+    logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
