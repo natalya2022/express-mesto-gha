@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { User, userSchemaObject } = require('../models/user');
+// const { User, userSchemaObject } = require('../models/user');
+const User = require('../models/user');
 const {
   OK,
   CREATED,
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  // UNAUTHORIZED,
 } = require('../errors/responses');
 const logErrors = require('../errors/logger');
 
@@ -47,14 +49,24 @@ module.exports.getUserId = async (req, res) => {
 
 module.exports.createUser = async (req, res) => {
   try {
+    // if (!req.body) {
+    //   return res.status(BAD_REQUEST.status).send({
+    //     message: BAD_REQUEST.message,
+    //   });
+    // }
     const {
       name, about, avatar, email, password,
     } = req.body;
-    if (req.body.password.length < userSchemaObject.password.minlength[0]) {
+    if (!email || !password) {
       return res.status(BAD_REQUEST.status).send({
-        message: userSchemaObject.password.minlength[1],
+        message: BAD_REQUEST.message,
       });
     }
+    // if (req.body.password.length < userSchemaObject.password.minlength[0]) {
+    //   return res.status(BAD_REQUEST.status).send({
+    //     message: userSchemaObject.password.minlength[1],
+    //   });
+    // }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: hash,
@@ -72,28 +84,6 @@ module.exports.createUser = async (req, res) => {
     });
   }
 };
-
-// module.exports.createUser = async (req, res) => {
-//   try {
-//     const {
-//       name, about, avatar, email, password,
-//     } = req.body;
-//     const user = await User.create({
-//       name, about, avatar, email, password,
-//     });
-//     return res.status(CREATED).send(user);
-//   } catch (err) {
-//     logErrors(req.user, req.params, err);
-//     if (err instanceof mongoose.Error.ValidationError) {
-//       return res.status(BAD_REQUEST.status).send({
-//         message: BAD_REQUEST.message,
-//       });
-//     }
-//     return res.status(INTERNAL_SERVER_ERROR.status).send({
-//       message: INTERNAL_SERVER_ERROR.message,
-//     });
-//   }
-// };
 
 module.exports.updateUser = async (req, res) => {
   try {
@@ -130,3 +120,19 @@ module.exports.updateAvatar = async (req, res) => {
     });
   }
 };
+
+// module.exports.login = async (req, res) => {
+//   try {
+
+//   } catch (err) {
+//     logErrors(req.user, req.params, req.body, err);
+//     if (err instanceof mongoose.Error.ValidationError) {
+//       return res.status(UNAUTHORIZED.status).send({
+//         message: UNAUTHORIZED.message,
+//       });
+//     }
+//     return res.status(INTERNAL_SERVER_ERROR.status).send({
+//       message: INTERNAL_SERVER_ERROR.message,
+//     });
+//   }
+// };
