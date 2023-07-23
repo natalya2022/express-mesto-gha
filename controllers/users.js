@@ -8,8 +8,9 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
-  // UNAUTHORIZED,
+  UNAUTHORIZED,
 } = require('../errors/responses');
+const { generateToken } = require('../utils/token');
 const logErrors = require('../errors/logger');
 
 module.exports.getUsers = async (req, res) => {
@@ -57,16 +58,21 @@ module.exports.createUser = async (req, res) => {
     const {
       name, about, avatar, email, password,
     } = req.body;
-    if (!email || !password) {
-      return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
-      });
-    }
+    // if (!email || !password) {
+    //   return res.status(BAD_REQUEST.status).send({
+    //     message: BAD_REQUEST.message,
+    //   });
+    // }
     // if (req.body.password.length < userSchemaObject.password.minlength[0]) {
     //   return res.status(BAD_REQUEST.status).send({
     //     message: userSchemaObject.password.minlength[1],
     //   });
     // }
+    if (await User.findOne({ email })) {
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
+      });
+    }
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
       name, about, avatar, email, password: hash,
@@ -121,18 +127,34 @@ module.exports.updateAvatar = async (req, res) => {
   }
 };
 
-// module.exports.login = async (req, res) => {
-//   try {
-
-//   } catch (err) {
-//     logErrors(req.user, req.params, req.body, err);
-//     if (err instanceof mongoose.Error.ValidationError) {
-//       return res.status(UNAUTHORIZED.status).send({
-//         message: UNAUTHORIZED.message,
-//       });
-//     }
-//     return res.status(INTERNAL_SERVER_ERROR.status).send({
-//       message: INTERNAL_SERVER_ERROR.message,
-//     });
-//   }
-// };
+module.exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(UNAUTHORIZED.status).send({
+        message: UNAUTHORIZED.message,
+      });
+    }
+    const matched = await bcrypt.compare(password, user.password);
+    if (!matched) {
+      return res.status(UNAUTHORIZED.status).send({
+        message: UNAUTHORIZED.message,
+      });
+    }
+    const payload = { _id: user._id };
+    const token = generateToken(payload);
+    res.cookie('jwt', token);
+    return res.status(OK).send(payload);
+  } catch (err) {
+    logErrors(req.user, req.params, req.body, err);
+    if (err instanceof mongoose.Error.ValidationError) {
+      return res.status(UNAUTHORIZED.status).send({
+        message: UNAUTHORIZED.message,
+      });
+    }
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
+    });
+  }
+};
