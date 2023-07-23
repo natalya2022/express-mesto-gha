@@ -7,6 +7,7 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
 } = require('../errors/responses');
+
 const logErrors = require('../errors/logger');
 
 module.exports.getCards = async (req, res) => {
