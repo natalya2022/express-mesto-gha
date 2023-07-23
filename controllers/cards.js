@@ -43,12 +43,18 @@ module.exports.createCard = async (req, res) => {
 module.exports.deleteCard = async (req, res) => {
   try {
     const { cardId } = req.params;
-    if (!await Card.findById({ _id: cardId })) {
+    const card = await Card.findById({ _id: cardId });
+    if (!card) {
       return res.status(NOT_FOUND.status).send({
         message: NOT_FOUND.message,
       });
     }
-    const card = await Card.findByIdAndRemove({ _id: cardId });
+    if (card.owner.toString() !== req.user._id) {
+      return res.status(403).send({
+        message: 'Невозможно удалить чужую карту',
+      });
+    }
+    await Card.findByIdAndRemove({ _id: cardId });
     return res.status(OK).send(card);
   } catch (err) {
     logErrors(req.user, req.params, err);

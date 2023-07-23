@@ -50,24 +50,9 @@ module.exports.getUserId = async (req, res) => {
 
 module.exports.createUser = async (req, res) => {
   try {
-    // if (!req.body) {
-    //   return res.status(BAD_REQUEST.status).send({
-    //     message: BAD_REQUEST.message,
-    //   });
-    // }
     const {
       name, about, avatar, email, password,
     } = req.body;
-    // if (!email || !password) {
-    //   return res.status(BAD_REQUEST.status).send({
-    //     message: BAD_REQUEST.message,
-    //   });
-    // }
-    // if (req.body.password.length < userSchemaObject.password.minlength[0]) {
-    //   return res.status(BAD_REQUEST.status).send({
-    //     message: userSchemaObject.password.minlength[1],
-    //   });
-    // }
     if (await User.findOne({ email })) {
       return res.status(BAD_REQUEST.status).send({
         message: BAD_REQUEST.message,
@@ -151,6 +136,23 @@ module.exports.login = async (req, res) => {
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(UNAUTHORIZED.status).send({
         message: UNAUTHORIZED.message,
+      });
+    }
+    return res.status(INTERNAL_SERVER_ERROR.status).send({
+      message: INTERNAL_SERVER_ERROR.message,
+    });
+  }
+};
+
+module.exports.getUserInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    return res.status(OK).send(user);
+  } catch (err) {
+    logErrors(req.user, req.params, req.body, err);
+    if (err instanceof mongoose.Error.CastError) {
+      return res.status(BAD_REQUEST.status).send({
+        message: BAD_REQUEST.message,
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
