@@ -82,7 +82,7 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hash,
     });
-    return res.status(CREATED).send({ _id: user._id, email: user.email });
+    return res.status(CREATED).send({ user });
   } catch (err) {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
