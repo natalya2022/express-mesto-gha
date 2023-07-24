@@ -13,6 +13,13 @@ const {
 const { generateToken } = require('../utils/token');
 const logErrors = require('../errors/logger');
 
+const BadRequestError = require('../errors/bad-request-err');
+const InternalServerError = require('../errors/internal-server-err');
+const ConflictError = require('../errors/conflict-err');
+const ConflictError = require('../errors/conflict-err');
+const ForbiddenError = require('../errors/forbidden-err');
+const UnauthorizedError = require('../errors/unauthorized-err');
+
 module.exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -20,7 +27,7 @@ module.exports.getUsers = async (req, res) => {
   } catch (err) {
     logErrors(req.user, req.params, req.body, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -31,7 +38,7 @@ module.exports.getUserId = async (req, res) => {
     const user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(NOT_FOUND.status).send({
-        message: NOT_FOUND.message,
+        message: 'Указанный id не найден',
       });
     }
     return res.status(OK).send(user);
@@ -39,11 +46,11 @@ module.exports.getUserId = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -55,7 +62,7 @@ module.exports.createUser = async (req, res) => {
     } = req.body;
     if (await User.findOne({ email })) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     const hash = await bcrypt.hash(password, 10);
@@ -67,11 +74,11 @@ module.exports.createUser = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -85,11 +92,11 @@ module.exports.updateUser = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -103,11 +110,11 @@ module.exports.updateAvatar = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -115,16 +122,16 @@ module.exports.updateAvatar = async (req, res) => {
 module.exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(UNAUTHORIZED.status).send({
-        message: UNAUTHORIZED.message,
+        message: 'Неверный email или пароль',
       });
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
       return res.status(UNAUTHORIZED.status).send({
-        message: UNAUTHORIZED.message,
+        message: 'Неверный email или пароль',
       });
     }
     const payload = { _id: user._id };
@@ -135,11 +142,11 @@ module.exports.login = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(UNAUTHORIZED.status).send({
-        message: UNAUTHORIZED.message,
+        message: 'Неверный email или пароль',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -152,11 +159,11 @@ module.exports.getUserInfo = async (req, res) => {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };

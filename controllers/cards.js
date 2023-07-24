@@ -17,7 +17,7 @@ module.exports.getCards = async (req, res) => {
   } catch (err) {
     logErrors(req.user, req.params, err);
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -32,11 +32,11 @@ module.exports.createCard = async (req, res) => {
     logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.ValidationError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -47,7 +47,7 @@ module.exports.deleteCard = async (req, res) => {
     const card = await Card.findById({ _id: cardId });
     if (!card) {
       return res.status(NOT_FOUND.status).send({
-        message: NOT_FOUND.message,
+        message: 'Указанный id не найден',
       });
     }
     if (card.owner.toString() !== req.user._id) {
@@ -61,11 +61,11 @@ module.exports.deleteCard = async (req, res) => {
     logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -75,7 +75,7 @@ module.exports.likeCard = async (req, res) => {
     const { cardId } = req.params;
     if (!await Card.findById({ _id: cardId })) {
       return res.status(NOT_FOUND.status).send({
-        message: NOT_FOUND.message,
+        message: 'Указанный id не найден',
       });
     }
     const card = await Card.findByIdAndUpdate(
@@ -88,11 +88,11 @@ module.exports.likeCard = async (req, res) => {
     logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };
@@ -102,7 +102,7 @@ module.exports.dislikeCard = async (req, res) => {
     const { cardId } = req.params;
     if (!await Card.findById({ _id: cardId })) {
       return res.status(NOT_FOUND.status).send({
-        message: NOT_FOUND.message,
+        message: 'Указанный id не найден',
       });
     }
     const card = await Card.findByIdAndUpdate(
@@ -115,11 +115,11 @@ module.exports.dislikeCard = async (req, res) => {
     logErrors(req.user, req.params, err);
     if (err instanceof mongoose.Error.CastError) {
       return res.status(BAD_REQUEST.status).send({
-        message: BAD_REQUEST.message,
+        message: 'Ошибка при введении данных',
       });
     }
     return res.status(INTERNAL_SERVER_ERROR.status).send({
-      message: INTERNAL_SERVER_ERROR.message,
+      message: 'Ошибка сервера',
     });
   }
 };

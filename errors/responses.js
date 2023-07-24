@@ -1,15 +1,19 @@
 const OK = 200;
 const CREATED = 201;
-const BAD_REQUEST = { status: 400, message: 'Ошибка при введении данных' };
-const UNAUTHORIZED = { status: 401, message: 'Неверный email или пароль' };
-const NOT_FOUND = { status: 404, message: 'Указанный id не найден' };
-const INTERNAL_SERVER_ERROR = { status: 500, message: 'Ошибка сервера' };
+const BAD_REQUEST_ERROR = 400;
+const UNAUTHORIZED_ERROR = 401;
+const FORBIDDEN_ERROR = 403;
+const NOT_FOUND_ERROR = 404;
+const CONFLICT_ERROR = 405;
+const INTERNAL_SERVER_ERROR = 500;
 
 module.exports = {
   OK,
   CREATED,
-  BAD_REQUEST,
-  NOT_FOUND,
+  BAD_REQUEST_ERROR,
+  NOT_FOUND_ERROR,
   INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
+  UNAUTHORIZED_ERROR,
+  FORBIDDEN_ERROR,
+  CONFLICT_ERROR,
 };
