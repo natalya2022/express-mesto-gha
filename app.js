@@ -4,7 +4,6 @@ const cors = require('cors');
 const cookies = require('cookie-parser');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
-// const logErrors = require('./errors/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -23,19 +22,10 @@ connector()
   .then(() => console.log('connect'))
   .catch((err) => console.error(err));
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '64ada5056b10e43fcd41d350',
-//   };
-//   next();
-// });
-
 app.use(router);
 
 app.use(errors());
 app.use((err, req, res, next) => {
-  console.log(err);
-  // logErrors(err);
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)

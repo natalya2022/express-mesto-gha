@@ -1,5 +1,4 @@
 const router = require('express').Router();
-// const { celebrate, Joi } = require('celebrate');
 const NotFoundError = require('../errors/not-found-err');
 const {
   createUser, login,
