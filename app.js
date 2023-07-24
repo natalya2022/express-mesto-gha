@@ -2,7 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const cookies = require('cookie-parser');
+const { errors } = require('celebrate');
 const router = require('./routes/index');
+// const logErrors = require('./errors/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -29,6 +31,21 @@ connector()
 // });
 
 app.use(router);
+
+app.use(errors());
+app.use((err, req, res, next) => {
+  console.log(err);
+  // logErrors(err);
+  const { statusCode = 500, message } = err;
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'Ошибка сервера'
+        : message,
+    });
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
