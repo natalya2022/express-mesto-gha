@@ -141,7 +141,7 @@ module.exports.updateAvatar = async (req, res, next) => {
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email });
     if (!user) {
       throw new UnauthorizedError('Неверный email или пароль');
       // return res.status(UNAUTHORIZED.status).send({
