@@ -82,7 +82,9 @@ module.exports.createUser = async (req, res, next) => {
     const user = await User.create({
       name, about, avatar, email, password: hash,
     });
-    return res.status(CREATED).send({ user });
+    return res.status(CREATED).send({
+      _id: user._id, email: user.email, name: user.name, about: user.about, avatar: user,
+    });
   } catch (err) {
     logErrors(req.user, req.params, req.body, err);
     if (err instanceof mongoose.Error.ValidationError) {
@@ -141,7 +143,7 @@ module.exports.updateAvatar = async (req, res, next) => {
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       throw new UnauthorizedError('Неверный email или пароль');
       // return res.status(UNAUTHORIZED.status).send({
