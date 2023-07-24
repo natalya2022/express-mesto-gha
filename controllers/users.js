@@ -83,7 +83,7 @@ module.exports.createUser = async (req, res, next) => {
       name, about, avatar, email, password: hash,
     });
     return res.status(CREATED).send({
-      _id: user._id, email: user.email, name: user.name, about: user.about, avatar: user,
+      _id: user._id, email: user.email, name: user.name, about: user.about, avatar: user.avatar,
     });
   } catch (err) {
     logErrors(req.user, req.params, req.body, err);
