@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const router = require('./routes/index');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const app = express();
 
 const limiter = rateLimit({
@@ -22,7 +22,7 @@ app.use(cors());
 app.use(helmet());
 
 async function connector() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+  await mongoose.connect(DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: false,
   });
@@ -41,7 +41,7 @@ app.use((err, req, res, next) => {
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'Ошибка сервера'
+        ? 'На сервере произошла ошибка'
         : message,
     });
   next();
