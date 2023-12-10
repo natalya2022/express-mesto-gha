@@ -13,7 +13,8 @@
   
 Остальные директории вспомогательные, создаются при необходимости разработчиком
 
-## Запуск проекта
+#### Стек (frontend, backend): React.js, HTML5, CSS3, JavaScript, Node.js, Express.js, MongoDB, Mongoose, CORS, адаптивная верстка
 
+## Запуск проекта
 `npm run start` — запускает сервер   
 `npm run dev` — запускает сервер с hot-reload
